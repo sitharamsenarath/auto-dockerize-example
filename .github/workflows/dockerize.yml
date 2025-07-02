@@ -1,26 +1,55 @@
-name: Auto Dockerize
+name: Auto Dockerize and Publish
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  dockerize:
+  build-and-push:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # optional, for full history
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Log in to GitHub Container Registry
-        run: echo ${{ secrets.DOCKER_IMAGE }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Detect language
+      id: detect
+      run: |
+        if ls *.py 1> /dev/null 2>&1 || test -f requirements.txt; then
+          echo "language=python" >> $GITHUB_OUTPUT
+        elif ls *.R 1> /dev/null 2>&1 || test -f DESCRIPTION; then
+          echo "language=R" >> $GITHUB_OUTPUT
+        else
+          echo "language=unknown" >> $GITHUB_OUTPUT
+        fi
 
-      - name: Run dockerize and push action
-        uses: sitharamsenarath/dockerize-and-push@main
-        with:
-          image_tag: latest
+    - name: Create Dockerfile for Python
+      if: steps.detect.outputs.language == 'python'
+      run: |
+        echo 'FROM python:3.9-slim
+        WORKDIR /main
+        COPY . /main
+        RUN pip install --no-cache-dir -r requirements.txt
+        CMD ["python", "app.py"]' > Dockerfile
+
+    - name: Create Dockerfile for R
+      if: steps.detect.outputs.language == 'R'
+      run: |
+        echo 'FROM r-base:latest
+        WORKDIR /app
+        COPY . /app
+        RUN R -e "if(!requireNamespace(\"renv\", quietly=TRUE)) install.packages(\"renv\"); renv::restore()"
+        CMD ["Rscript", "app.R"]' > Dockerfile
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.DOCKER_IMAGE }}
+
+    - name: Build and push Docker image
+      run: |
+        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}
+        docker build -t $IMAGE_NAME:latest .
+        docker push $IMAGE_NAME:latest
