@@ -17,6 +17,9 @@ jobs:
         with:
           fetch-depth: 0  # optional, for full history
 
+      - name: Log in to GitHub Container Registry
+        run: echo ${{ secrets.DOCKER_IMAGE }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
       - name: Run dockerize and push action
         uses: sitharamsenarath/dockerize-and-push@main
         with:
