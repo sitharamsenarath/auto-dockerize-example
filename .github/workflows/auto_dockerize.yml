@@ -11,4 +11,5 @@ jobs:
     with:
       ref: ${{ github.ref_name }}
       repo: ${{ github.repository }}
+    secrets:
       token: ${{ secrets.DOCKER_IMAGE }}
