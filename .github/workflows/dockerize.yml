@@ -1,0 +1,20 @@
+name: Auto Dockerize
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  dockerize:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: sitharamsenarath/dockerize-and-push@v1
+        with:
+          image_tag: latest
