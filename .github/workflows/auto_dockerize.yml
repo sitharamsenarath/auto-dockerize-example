@@ -11,3 +11,4 @@ jobs:
     with:
       ref: ${{ github.ref_name }}
       repo: ${{ github.repository }}
+      token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
