@@ -15,6 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: sitharamsenarath/dockerize-and-push@v1
+      - uses: sitharamsenarath/dockerize-and-push@v2
         with:
           image_tag: latest
