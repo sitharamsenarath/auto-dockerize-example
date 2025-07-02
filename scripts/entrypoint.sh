@@ -3,6 +3,9 @@ set -e
 
 TAG=$1
 
+# Login to GHCR non-interactively
+echo "$DOCKER_IMAGE" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
 echo "🔍 Detecting project type..."
 
 if [ -f "requirements.txt" ] && [ -f "main.py" ]; then
