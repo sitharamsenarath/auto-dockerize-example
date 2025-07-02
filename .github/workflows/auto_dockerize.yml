@@ -1,0 +1,13 @@
+name: Auto Dockerize Call
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  call-auto-dockerize:
+    uses: sitharamsenarath/dockerize-and-push/.github/workflows/dockerize.yml@main
+    with:
+      ref: ${{ github.ref_name }}
+      repo: ${{ github.repository }}
