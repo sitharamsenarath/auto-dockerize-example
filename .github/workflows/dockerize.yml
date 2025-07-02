@@ -16,10 +16,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # optional, for full history
-    
-      - name: Clone entrypoint script repo
-        run: git clone https://github.com/sitharamsenarath/dockerize-and-push.git
-    
+
       - name: Run dockerize and push action
         uses: sitharamsenarath/dockerize-and-push@main
         with:
